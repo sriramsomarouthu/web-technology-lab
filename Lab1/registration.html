@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Registration</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 20px; }
+        img { max-width: 150px; height: auto; display: block; margin: 0 auto 20px; }
+        label { display: block; margin: 10px 0 5px; font-weight: bold; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { padding: 12px 24px; margin: 5px; background: #28a745; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #218838; }
+        h1 { text-align: center; }
+    </style>
+</head>
+<body>
+    <img src="university-logo.png" alt="University Logo">
+    <h1>Student Registration Form</h1>
+    <form id="registrationForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <label for="roll">Roll Number:</label>
+        <input type="text" id="roll" name="roll">
+        <label for="mobile">Mobile Number:</label>
+        <input type="text" id="mobile" name="mobile">
+        <label for="gmail">Gmail ID:</label>
+        <input type="text" id="gmail" name="gmail">
+        <button type="submit">Submit</button>
+        <a href="index.html">
+            <button type="button">Back to home</button>
+        </a>
+    </form>
+    <script src="script.js"></script>
+</body>
+</html>
