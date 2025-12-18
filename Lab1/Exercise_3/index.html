@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Advanced Registration Form</title>
+</head>
+<body>
+
+  <h2>User Registration</h2>
+
+  <form action="#" method="post" enctype="multipart/form-data">
+    <!-- Full Name -->
+    <label for="fullName">Full Name:</label><br>
+    <input type="text" id="fullName" name="fullName" placeholder="Full Name"><br><br>
+
+    <!-- Email -->
+    <label for="email">Email:</label><br>
+    <input type="email" id="email" name="email" placeholder="Ex:abcd@gmail.com" required><br><br>
+
+    <!-- Date of Birth -->
+    <label for="dob">Date of Birth:</label><br>
+    <input type="date" id="dob" name="dob" required><br><br>
+
+    <!-- Phone Number -->
+    <label for="phone">Phone Number:</label><br>
+    <input type="tel" id="phone" name="phone" placeholder="10 digit mobile num"><br><br>
+
+    <!-- Password -->
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password" required><br><br>
+
+    <!-- Profile Picture -->
+    <label for="profilePic">Choose Profile Picture:</label><br>
+    <input type="file" id="profilePic" name="profilePic" accept="image/*" required><br><br>
+
+    <label>
+      <input type="checkbox" id="terms" name="terms" required>
+      I accept the Terms &amp; Conditions
+    </label><br><br>
+
+    <!-- Submit Button -->
+    <input type="submit" value="Register">
+  </form>
+
+</body>
+</html>

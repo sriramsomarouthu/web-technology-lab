@@ -1,0 +1,54 @@
+/* Global styles */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+/* Header */
+.site-header {
+  background-color: #2b13e2;
+  color: #fff;
+  text-align: center;
+  padding: 30px 10px;
+}
+
+.site-header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+
+.site-header .tagline {
+  margin-top: 8px;
+  font-size: 16px;
+}
+
+/* Sections */
+section {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 6px;
+}
+
+section h2 {
+  margin-top: 0;
+  color: #041426;
+}
+
+/* Lists */
+#skills ul,
+#projects ul {
+  padding-left: 20px;
+}
+
+/* Footer */
+.site-footer {
+  background-color: #333;
+  color: #fff;
+  text-align: center;
+  padding: 15px 10px;
+  margin-top: 20px;
+}
