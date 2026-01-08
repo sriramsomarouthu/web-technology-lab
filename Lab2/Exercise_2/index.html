@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>HTML5 Audio and Video</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <h1>HTML5 Audio and Video</h1>
+
+  <section>
+    <h2>In the Strrets of Fire</h2>
+    <audio id="myAudio" controls>
+      <!-- Replace with your real file -->
+      <source src="In The Streets Of Fire.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+    <p>Current time: <span id="audioTime">0:00</span></p>
+  </section>
+
+  <section>
+    <h2>Video Player</h2>
+    <video id="myVideo" width="480" controls>
+      <!-- Replace with your real file -->
+      <source src="Salaar-new-movie-full-screen.mp4" type="video/mp4" />
+      Your browser does not support the video element.
+    </video>
+    <p>Current time: <span id="videoTime">0:00</span></p>
+  </section>
+
+  <script src="script.js"></script>
+</body>
+</html>

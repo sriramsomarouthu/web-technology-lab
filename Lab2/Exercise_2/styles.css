@@ -1,0 +1,66 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #efeeee29;
+}
+
+h1 {
+  text-align: center;
+}
+
+section {
+  margin-bottom: 30px;
+  padding: 15px;
+  background: #15ada345;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgb(220, 30, 30);
+  /* Center content safely */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* FIXED AUDIO section - brighter text for visibility */
+section:nth-of-type(1) {
+  background-image: url('og.jpg');
+  background-size: cover;
+  background-position: center;
+  background-blend-mode: overlay;
+  /* FIXED: Bright white text + !important to override */
+  color: white !important;
+  /* MORE SPACE */
+  padding: 20px 20px;
+  min-height: 250px;
+  margin-bottom: 50px;
+}
+
+/* Ensure audio/video always visible and sized right */
+audio, video {
+  max-width: 90%;
+  width: 400px; /* Good default size */
+  min-height: 50px;
+  background: rgba(255,255,255,0.9); /* Light backdrop for controls */
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+/* Headings and text in audio section */
+section:nth-of-type(1) h2,
+section:nth-of-type(1) p {
+  color: white !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8); /* Readable shadow */
+  background: rgba(0,0,0,0.3); /* Semi-transparent bg */
+  padding: 5px 15px;
+  border-radius: 20px;
+  margin: 10px 0;
+}
+
+section:nth-of-type(2) {
+  background: #15ada345;
+}
+
+p {
+  margin-top: 10px;
+  font-weight: bold;
+}

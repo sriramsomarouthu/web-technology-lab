@@ -1,0 +1,14 @@
+/* Center the canvas on the page */
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #faf8f8;
+}
+
+/* Optional: add a border to see the canvas clearly */
+#myCanvas {
+  border: 1px solid #000;
+}
