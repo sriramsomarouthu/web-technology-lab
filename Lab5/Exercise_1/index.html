@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Employee Management System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Employee Management System (XML + AJAX)</h2>
+
+<button onclick="loadEmployees()">Load Employees</button>
+
+<table id="empTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Department</th>
+            <th>Salary</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h3>Add / Update / Delete Employee</h3>
+
+<input type="text" id="eid" placeholder="Employee ID">
+<input type="text" id="ename" placeholder="Name">
+<input type="text" id="edept" placeholder="Department">
+<input type="text" id="esalary" placeholder="Salary">
+
+<br><br>
+
+<button onclick="addEmployee()">Add</button>
+<button onclick="updateEmployee()">Update</button>
+<button onclick="deleteEmployee()">Delete</button>
+
+<p id="msg"></p>
+
+<script src="script.js"></script>
+</body>
+</html>
