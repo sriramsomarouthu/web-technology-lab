@@ -1,0 +1,35 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+table {
+    width: 70%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #f0f0f0;
+}
+
+input {
+    margin: 5px;
+    padding: 6px;
+}
+
+button {
+    margin: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+#msg {
+    font-weight: bold;
+}
