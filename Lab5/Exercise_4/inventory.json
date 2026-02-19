@@ -1,0 +1,18 @@
+{
+  "products": [
+    {
+      "id": 201,
+      "name": "Laptop",
+      "category": "Electronics",
+      "price": 60000,
+      "stock": 5
+    },
+    {
+      "id": 202,
+      "name": "Notebook",
+      "category": "Stationery",
+      "price": 50,
+      "stock": 100
+    }
+  ]
+}

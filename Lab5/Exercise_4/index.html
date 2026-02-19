@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Product Inventory System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Product Inventory System (JSON)</h2>
+
+<button onclick="loadInventory()">Load Inventory</button>
+
+<input type="text" id="searchCat" placeholder="Search by Category">
+<button onclick="searchByCategory()">Search</button>
+
+<table id="inventoryTable">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Stock</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h3>Add / Update / Delete Product</h3>
+
+<input type="number" id="pid" placeholder="Product ID">
+<input type="text" id="pname" placeholder="Name">
+<input type="text" id="pcategory" placeholder="Category">
+<input type="number" id="pprice" placeholder="Price">
+<input type="number" id="pstock" placeholder="Stock">
+
+<br><br>
+
+<button onclick="addProduct()">Add</button>
+<button onclick="updateProduct()">Update</button>
+<button onclick="deleteProduct()">Delete</button>
+
+<h3>Total Inventory Value: ₹<span id="totalValue">0</span></h3>
+
+<p id="msg"></p>
+
+<script src="script.js"></script>
+</body>
+</html>
