@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<library>
+    <book>
+        <id>B101</id>
+        <title>Java Programming</title>
+        <author>James Gosling</author>
+        <status>Available</status>
+    </book>
+    <book>
+        <id>B102</id>
+        <title>XML Fundamentals</title>
+        <author>Tim Bray</author>
+        <status>Issued</status>
+    </book>
+</library>

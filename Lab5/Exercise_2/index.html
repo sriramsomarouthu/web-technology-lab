@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Library Book Tracker</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h2>Library Book Tracker (XML DOM)</h2>
+
+<button onclick="loadBooks()">Load Books</button>
+
+<table id="bookTable">
+    <thead>
+        <tr>
+            <th>Book ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<h3>Add / Update / Delete Book</h3>
+
+<input type="text" id="bid" placeholder="Book ID">
+<input type="text" id="btitle" placeholder="Title">
+<input type="text" id="bauthor" placeholder="Author">
+<input type="text" id="bstatus" placeholder="Available / Issued">
+
+<br><br>
+
+<button onclick="addBook()">Add Book</button>
+<button onclick="updateStatus()">Update Status</button>
+<button onclick="deleteBook()">Delete Book</button>
+
+<p id="msg"></p>
+
+<script src="script.js"></script>
+</body>
+</html>
