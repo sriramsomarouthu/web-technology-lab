@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BookShelf — Online Book Finder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;900&family=Inconsolata:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════════════════════
+       CSS VARIABLES — Warm off-white monochromatic
+    ═══════════════════════════════════════════════ */
+    :root {
+      --paper:    #f5f0e8;
+      --paper-1:  #ede7d9;
+      --paper-2:  #e0d8c8;
+      --paper-3:  #d0c8b4;
+      --ink-faint:#b8ae98;
+      --ink-dim:  #9a8e78;
+      --ink-mute: #7a6e58;
+      --ink-soft: #5a5040;
+      --ink-body: #3a3228;
+      --ink-head: #1e1810;
+      --ink:      #100e08;
+      --accent:   #2c2418;
+      --rust:     #8b4513;
+      --rust-lt:  #a0522d;
+      --gold:     #b8860b;
+      --gold-lt:  #daa520;
+      --border:   #cfc5b0;
+      --border-dk:#b0a490;
+      --shadow:   0 2px 16px rgba(30,20,10,0.12);
+      --shadow-lg:0 8px 48px rgba(30,20,10,0.18);
+      --radius-sm:3px;
+      --radius-md:6px;
+      --radius-lg:12px;
+      --font-head:'Playfair Display', Georgia, serif;
+      --font-mono:'Inconsolata', monospace;
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink-body);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* Subtle aged-paper texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(184,134,11,0.04) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(139,69,19,0.04) 0%, transparent 60%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       HEADER
+    ═══════════════════════════════════════════════ */
+    .site-header {
+      position: relative; z-index: 10;
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0 40px;
+    }
+
+    .header-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 20px 0 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .logo {
+      display: flex; align-items: baseline; gap: 14px;
+    }
+
+    .logo-name {
+      font-family: var(--font-head);
+      font-size: 26px; font-weight: 900;
+      color: var(--paper);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-name em {
+      font-style: normal;
+      color: var(--gold-lt);
+    }
+
+    .logo-tagline {
+      font-size: 10px; letter-spacing: 3px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.35);
+    }
+
+    .header-stats {
+      display: flex; align-items: center; gap: 24px;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: var(--font-head);
+      font-size: 20px; font-weight: 700;
+      color: var(--gold-lt);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 9px; letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.3);
+    }
+
+    .stat-divider {
+      width: 1px; height: 32px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOOLBAR / CONTROLS
+    ═══════════════════════════════════════════════ */
+    .toolbar {
+      position: relative; z-index: 9;
+      background: var(--ink-head);
+      padding: 0 40px;
+    }
+
+    .toolbar-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: flex; align-items: center;
+      gap: 0;
+      padding: 12px 0;
+      overflow-x: auto;
+    }
+
+    /* Search bar */
+    .search-bar {
+      display: flex; align-items: center;
+      background: rgba(245,240,232,0.07);
+      border: 1px solid rgba(245,240,232,0.12);
+      border-radius: var(--radius-md);
+      padding: 8px 14px;
+      gap: 8px;
+      flex: 1; min-width: 200px; max-width: 320px;
+      margin-right: 16px;
+    }
+
+    .search-icon { color: rgba(245,240,232,0.3); font-size: 14px; }
+
+    .search-bar input {
+      background: transparent; border: none; outline: none;
+      color: var(--paper); font-family: var(--font-mono);
+      font-size: 13px; width: 100%;
+    }
+
+    .search-bar input::placeholder { color: rgba(245,240,232,0.25); }
+
+    /* Filter pills */
+    .filter-group {
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .filter-label {
+      font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(245,240,232,0.25); margin-right: 4px; white-space: nowrap;
+    }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--font-mono); font-size: 11px;
+      letter-spacing: 0.5px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      border: 1px solid rgba(245,240,232,0.12);
+      color: rgba(245,240,232,0.45);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+      white-space: nowrap;
+    }
+
+    .pill:hover { border-color: rgba(245,240,232,0.3); color: var(--paper); }
+
+    .pill.active {
+      background: var(--gold-lt);
+      border-color: var(--gold-lt);
+      color: var(--ink);
+      font-weight: 600;
+    }
+
+    .toolbar-divider {
+      width: 1px; height: 24px;
+      background: rgba(255,255,255,0.08);
+      margin: 0 16px; flex-shrink: 0;
+    }
+
+    /* ═══════════════════════════════════════════════
+       LAYOUT
+    ═══════════════════════════════════════════════ */
+    .page-body {
+      position: relative; z-index: 1;
+      max-width: 1280px; margin: 0 auto;
+      padding: 36px 40px 80px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       SECTION HEADER
+    ═══════════════════════════════════════════════ */
+    .section-header {
+      display: flex; align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 14px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 22px; font-weight: 700;
+      color: var(--ink-head);
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .section-badge {
+      font-family: var(--font-mono);
+      font-size: 10px; font-weight: 600;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      background: var(--ink); color: var(--paper);
+      padding: 3px 10px; border-radius: 100px;
+    }
+
+    .section-meta {
+      font-size: 11px; color: var(--ink-dim);
+      letter-spacing: 0.5px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       CATEGORY CHIPS ROW
+    ═══════════════════════════════════════════════ */
+    .category-chips {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .chip {
+      font-family: var(--font-mono); font-size: 12px;
+      padding: 8px 18px;
+      border: 1px solid var(--border-dk);
+      border-radius: 100px;
+      color: var(--ink-mute);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+
+    .chip:hover { border-color: var(--ink-soft); color: var(--ink-head); background: var(--paper-1); }
+
+    .chip.active {
+      background: var(--ink); color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    /* ═══════════════════════════════════════════════
+       TOP RATED STRIP
+    ═══════════════════════════════════════════════ */
+    .top-strip {
+      background: var(--ink);
+      border-radius: var(--radius-lg);
+      padding: 24px 28px;
+      margin-bottom: 40px;
+      overflow: hidden;
+    }
+
+    .top-strip-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .top-strip-title {
+      font-family: var(--font-head);
+      font-size: 16px; font-weight: 700;
+      color: var(--paper);
+    }
+
+    .trophy { font-size: 18px; }
+
+    .top-books-row {
+      display: flex; gap: 12px;
+      overflow-x: auto; padding-bottom: 4px;
+    }
+
+    .top-book-chip {
+      background: rgba(245,240,232,0.06);
+      border: 1px solid rgba(245,240,232,0.1);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      min-width: 200px;
+      flex-shrink: 0;
+      transition: all 0.18s;
+    }
+
+    .top-book-chip:hover { background: rgba(245,240,232,0.1); border-color: rgba(245,240,232,0.2); }
+
+    .top-book-rank {
+      font-family: var(--font-head);
+      font-size: 28px; font-weight: 900;
+      color: var(--gold-lt);
+      line-height: 1; margin-bottom: 6px;
+      opacity: 0.6;
+    }
+
+    .top-book-title {
+      font-family: var(--font-head);
+      font-size: 13px; font-weight: 600;
+      color: var(--paper);
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+
+    .top-book-author {
+      font-size: 11px; color: rgba(245,240,232,0.35);
+      margin-bottom: 8px;
+    }
+
+    .rating-stars {
+      display: flex; align-items: center; gap: 4px;
+    }
+
+    .star-fill { color: var(--gold-lt); font-size: 11px; }
+    .star-empty { color: rgba(245,240,232,0.2); font-size: 11px; }
+    .rating-num { font-size: 11px; color: rgba(245,240,232,0.5); margin-left: 4px; }
+
+    /* ═══════════════════════════════════════════════
+       SORT BAR
+    ═══════════════════════════════════════════════ */
+    .sort-bar {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .sort-label {
+      font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-dim);
+    }
+
+    .sort-btn {
+      font-family: var(--font-mono); font-size: 11px;
+      padding: 6px 16px;
+      border: 1px solid var(--border-dk);
+      border-radius: 100px;
+      color: var(--ink-mute);
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .sort-btn:hover { border-color: var(--ink-soft); color: var(--ink-head); }
+
+    .sort-btn.active {
+      background: var(--ink); color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .sort-arrow { font-size: 10px; }
+
+    .results-count {
+      margin-left: auto;
+      font-size: 11px; color: var(--ink-dim);
+      letter-spacing: 0.5px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BOOK GRID
+    ═══════════════════════════════════════════════ */
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    /* ═══════════════════════════════════════════════
+       BOOK CARD
+    ═══════════════════════════════════════════════ */
+    .book-card {
+      background: var(--paper-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all 0.22s ease;
+      animation: cardIn 0.35s ease both;
+      display: flex; flex-direction: column;
+    }
+
+    @keyframes cardIn {
+      from { opacity:0; transform: translateY(12px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+
+    .book-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-dk);
+    }
+
+    .book-spine {
+      height: 5px;
+      background: var(--ink);
+    }
+
+    /* Each category gets a different spine color */
+    .book-card[data-cat="Programming"]  .book-spine { background: #2c5f8a; }
+    .book-card[data-cat="Database"]     .book-spine { background: #2d6a4f; }
+    .book-card[data-cat="Web Dev"]      .book-spine { background: #7b2d8b; }
+    .book-card[data-cat="AI & ML"]      .book-spine { background: #8b1a1a; }
+    .book-card[data-cat="DevOps"]       .book-spine { background: #6b4c11; }
+    .book-card[data-cat="Software Eng"] .book-spine { background: #1a4a6b; }
+    .book-card[data-cat="Security"]     .book-spine { background: #4a1a1a; }
+
+    .book-card-body { padding: 18px 20px; flex: 1; }
+
+    .book-category {
+      font-size: 9px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--ink-dim);
+      margin-bottom: 8px;
+    }
+
+    .book-title {
+      font-family: var(--font-head);
+      font-size: 16px; font-weight: 700;
+      color: var(--ink-head);
+      line-height: 1.35;
+      margin-bottom: 6px;
+    }
+
+    .book-author {
+      font-size: 12px; color: var(--ink-mute);
+      margin-bottom: 14px;
+      font-style: italic;
+    }
+
+    .book-card-footer {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--paper-2);
+    }
+
+    .book-price {
+      font-family: var(--font-head);
+      font-size: 18px; font-weight: 700;
+      color: var(--ink-head);
+    }
+
+    .book-price span {
+      font-size: 11px; font-weight: 400;
+      color: var(--ink-dim);
+      font-family: var(--font-mono);
+    }
+
+    .book-meta-right { text-align: right; }
+
+    .book-rating-row {
+      display: flex; align-items: center; gap: 4px;
+      justify-content: flex-end; margin-bottom: 2px;
+    }
+
+    .star { font-size: 10px; }
+    .star.filled { color: var(--gold); }
+    .star.empty  { color: var(--border-dk); }
+
+    .book-year {
+      font-size: 10px; color: var(--ink-faint);
+    }
+
+    /* ═══════════════════════════════════════════════
+       PAGINATION
+    ═══════════════════════════════════════════════ */
+    .pagination-bar {
+      display: flex; align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 40px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+
+    .page-info {
+      font-size: 12px; color: var(--ink-dim);
+      letter-spacing: 0.5px;
+    }
+
+    .page-btn {
+      font-family: var(--font-mono); font-size: 12px;
+      padding: 8px 22px;
+      border: 1px solid var(--border-dk);
+      border-radius: var(--radius-md);
+      color: var(--ink-soft);
+      background: var(--paper-1);
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: var(--ink); color: var(--paper);
+      border-color: var(--ink);
+    }
+
+    .page-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    .load-more-btn {
+      font-family: var(--font-mono); font-size: 12px;
+      letter-spacing: 1px; text-transform: uppercase;
+      padding: 12px 32px;
+      border: 1px solid var(--border-dk);
+      border-radius: var(--radius-md);
+      color: var(--ink-soft);
+      background: var(--paper-1);
+      cursor: pointer;
+      transition: all 0.22s;
+    }
+
+    .load-more-btn:hover { background: var(--ink); color: var(--paper); }
+
+    /* ═══════════════════════════════════════════════
+       EMPTY / LOADING
+    ═══════════════════════════════════════════════ */
+    .state-box {
+      text-align: center; padding: 64px 24px;
+      grid-column: 1 / -1;
+    }
+
+    .state-icon { font-size: 40px; opacity: 0.25; margin-bottom: 16px; }
+
+    .state-title {
+      font-family: var(--font-head);
+      font-size: 18px; color: var(--ink-soft);
+      margin-bottom: 8px;
+    }
+
+    .state-sub { font-size: 12px; color: var(--ink-dim); }
+
+    .spinner {
+      width: 20px; height: 20px;
+      border: 2px solid var(--border-dk);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block; vertical-align: middle;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════ */
+    .toast-wrap {
+      position: fixed; bottom: 28px; right: 28px;
+      z-index: 9999; display: flex;
+      flex-direction: column; gap: 8px;
+    }
+
+    .toast {
+      background: var(--ink-head);
+      color: var(--paper);
+      font-family: var(--font-mono); font-size: 12px;
+      padding: 11px 18px;
+      border-radius: var(--radius-md);
+      border-left: 3px solid var(--gold-lt);
+      min-width: 240px;
+      animation: toastIn 0.28s ease;
+      box-shadow: var(--shadow-lg);
+    }
+
+    @keyframes toastIn {
+      from { opacity:0; transform: translateX(16px); }
+      to   { opacity:1; transform: translateX(0); }
+    }
+
+    /* ═══════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .site-header, .toolbar { padding: 0 20px; }
+      .page-body { padding: 24px 20px 60px; }
+      .header-stats { display: none; }
+      .books-grid { grid-template-columns: 1fr 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      .books-grid { grid-template-columns: 1fr; }
+      .toolbar-inner { gap: 6px; }
+    }
+
+    ::-webkit-scrollbar { height: 4px; width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--paper-1); }
+    ::-webkit-scrollbar-thumb { background: var(--border-dk); border-radius: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ──────────────────────────────────────── -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-name">Book<em>Shelf</em></div>
+      <div class="logo-tagline">Online Book Finder</div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-item">
+        <span class="stat-num" id="totalBooksCount">—</span>
+        <span class="stat-label">Total Books</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" id="totalCatsCount">—</span>
+        <span class="stat-label">Categories</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-num" id="topRatedCount">—</span>
+        <span class="stat-label">Top Rated</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ── TOOLBAR ─────────────────────────────────────── -->
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <!-- Search -->
+    <div class="search-bar">
+      <span class="search-icon">⌕</span>
+      <input type="text" id="searchInput" placeholder="Search by title…"
+             oninput="handleSearch(this.value)" />
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Sort -->
+    <span class="filter-label">Sort</span>
+    <div class="filter-group">
+      <button class="pill active" id="sortDefault" onclick="setSort('default')">All</button>
+      <button class="pill" id="sortPrice"   onclick="setSort('price')">↑ Price</button>
+      <button class="pill" id="sortRating"  onclick="setSort('rating')">★ Rating</button>
+    </div>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- View Mode -->
+    <span class="filter-label">Filter</span>
+    <div class="filter-group">
+      <button class="pill active" id="filterAll" onclick="setCategory('all')">All</button>
+      <button class="pill" id="filterTop"    onclick="loadTopRated()">Top Rated</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN BODY ────────────────────────────────────── -->
+<main class="page-body">
+
+  <!-- TOP RATED STRIP -->
+  <div class="top-strip" id="topStrip">
+    <div class="top-strip-header">
+      <span class="trophy">🏆</span>
+      <div class="top-strip-title">Top Rated Books</div>
+      <span style="font-size:10px; color:rgba(245,240,232,0.25); margin-left:8px; letter-spacing:1px;">RATING ≥ 4.0</span>
+    </div>
+    <div class="top-books-row" id="topBooksRow">
+      <div style="color:rgba(245,240,232,0.3); font-size:12px; display:flex; align-items:center; gap:10px;">
+        <span class="spinner" style="border-color:rgba(255,255,255,0.1); border-top-color:rgba(255,255,255,0.4);"></span>
+        Loading top books…
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY CHIPS -->
+  <div class="section-header">
+    <div class="section-title">
+      Browse Collection
+      <span class="section-badge" id="activeModeLabel">All Books</span>
+    </div>
+    <div class="section-meta" id="sectionMeta">Showing all books</div>
+  </div>
+
+  <div class="category-chips" id="categoryChips">
+    <button class="chip active" data-cat="all" onclick="setCategory('all')">All</button>
+    <!-- populated dynamically -->
+  </div>
+
+  <!-- SORT BAR -->
+  <div class="sort-bar">
+    <span class="sort-label">Order</span>
+    <button class="sort-btn active" id="sbDefault" onclick="setSort('default')">Default</button>
+    <button class="sort-btn" id="sbPrice"   onclick="setSort('price')">
+      Price <span class="sort-arrow">↑</span>
+    </button>
+    <button class="sort-btn" id="sbRating"  onclick="setSort('rating')">
+      Rating <span class="sort-arrow">↓</span>
+    </button>
+    <span class="results-count" id="resultsCount"></span>
+  </div>
+
+  <!-- BOOKS GRID -->
+  <div class="books-grid" id="booksGrid">
+    <div class="state-box">
+      <div class="spinner"></div>
+      <p style="color:var(--ink-dim); margin-top:16px; font-size:12px;">Loading books…</p>
+    </div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pagination-bar" id="paginationBar" style="display:none;">
+    <button class="page-btn" id="prevBtn" onclick="changePage(-1)">← Prev</button>
+    <span class="page-info" id="pageInfo">Page 1 of 1</span>
+    <button class="page-btn" id="nextBtn" onclick="changePage(1)">Next →</button>
+  </div>
+
+</main>
+
+<!-- ── TOAST ────────────────────────────────────────── -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- ── JAVASCRIPT ───────────────────────────────────── -->
+<script>
+  /* ── CONFIG ──────────────────────────────────────── */
+  const API = '';
+  let currentPage   = 1;
+  let currentSort   = 'default';
+  let currentCat    = 'all';
+  let searchTimer   = null;
+  let isSearchMode  = false;
+  let isCatMode     = false;
+  let isTopMode     = false;
+
+  /* ── HELPERS ─────────────────────────────────────── */
+  const $  = id => document.getElementById(id);
+  const qs = s  => document.querySelector(s);
+
+  function toast(msg) {
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.textContent = msg;
+    $('toastWrap').appendChild(el);
+    setTimeout(() => { el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(()=>el.remove(),300); }, 2800);
+  }
+
+  function starsHTML(rating, light=false) {
+    const full  = Math.floor(rating);
+    const half  = rating - full >= 0.5 ? 1 : 0;
+    const empty = 5 - full - half;
+    const sf = light ? 'star-fill' : 'star filled';
+    const se = light ? 'star-empty' : 'star empty';
+    return '★'.repeat(full).split('').map(()=>`<span class="${sf}">★</span>`).join('') +
+           (half ? `<span class="${sf}" style="opacity:0.6">★</span>` : '') +
+           '☆'.repeat(empty).split('').map(()=>`<span class="${se}">☆</span>`).join('');
+  }
+
+  /* ── INIT ─────────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', () => {
+    loadTopRatedStrip();
+    loadCategories();
+    fetchPage(1);
+  });
+
+  /* ── TOP RATED STRIP ─────────────────────────────── */
+  async function loadTopRatedStrip() {
+    try {
+      const res  = await fetch(`${API}/books/top`);
+      const data = await res.json();
+      $('topRatedCount').textContent = data.length;
+      $('topBooksRow').innerHTML = data.map((b, i) => `
+        <div class="top-book-chip">
+          <div class="top-book-rank">#${i+1}</div>
+          <div class="top-book-title">${escHtml(b.title)}</div>
+          <div class="top-book-author">${escHtml(b.author)}</div>
+          <div class="rating-stars">
+            ${starsHTML(b.rating, true)}
+            <span class="rating-num">${b.rating}</span>
+          </div>
+        </div>
+      `).join('');
+    } catch {
+      $('topBooksRow').innerHTML = `<div style="color:rgba(245,240,232,0.3);font-size:12px;">Could not load top books.</div>`;
+    }
+  }
+
+  /* ── CATEGORIES ──────────────────────────────────── */
+  async function loadCategories() {
+    try {
+      const res  = await fetch(`${API}/books/categories`);
+      const cats = await res.json();
+      $('totalCatsCount').textContent = cats.length;
+
+      const chips = $('categoryChips');
+      cats.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'chip';
+        btn.dataset.cat = cat;
+        btn.textContent = cat;
+        btn.onclick = () => setCategory(cat);
+        chips.appendChild(btn);
+      });
+    } catch { /* silent */ }
+  }
+
+  /* ── PAGINATED LOAD ──────────────────────────────── */
+  async function fetchPage(page) {
+    isSearchMode = false; isCatMode = false; isTopMode = false;
+    currentPage = page;
+    showGridLoading();
+
+    try {
+      let url = `${API}/books?page=${page}`;
+      const res  = await fetch(url);
+      const data = await res.json();
+
+      $('totalBooksCount').textContent = data.totalBooks;
+      renderBooks(data.books);
+      updatePagination(data.page, data.totalPages);
+      $('resultsCount').textContent = `${data.totalBooks} books total`;
+      $('activeModeLabel').textContent = 'All Books';
+      $('sectionMeta').textContent = `Page ${data.page} of ${data.totalPages}`;
+    } catch {
+      showError();
+    }
+  }
+
+  /* ── SEARCH ──────────────────────────────────────── */
+  function handleSearch(val) {
+    clearTimeout(searchTimer);
+    if (!val.trim()) {
+      isSearchMode = false;
+      fetchPage(1);
+      return;
+    }
+    searchTimer = setTimeout(() => doSearch(val), 320);
+  }
+
+  async function doSearch(q) {
+    isSearchMode = true;
+    showGridLoading();
+    hidePagination();
+
+    try {
+      const res   = await fetch(`${API}/books/search?title=${encodeURIComponent(q)}`);
+      const books = await res.json();
+
+      renderBooks(applyClientSort(books));
+      $('resultsCount').textContent = `${books.length} result${books.length!==1?'s':''}`;
+      $('activeModeLabel').textContent = 'Search';
+      $('sectionMeta').textContent = `Results for "${q}"`;
+      if (books.length === 0) toast(`No books found for "${q}"`);
+    } catch { showError(); }
+  }
+
+  /* ── CATEGORY ─────────────────────────────────────── */
+  async function setCategory(cat) {
+    currentCat = cat;
+    $('searchInput').value = '';
+
+    // Update chip active state
+    document.querySelectorAll('.chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.cat === cat);
+    });
+
+    if (cat === 'all') { fetchPage(1); return; }
+
+    isCatMode = true;
+    showGridLoading();
+    hidePagination();
+
+    try {
+      const res   = await fetch(`${API}/books/category/${encodeURIComponent(cat)}`);
+      const books = await res.json();
+
+      renderBooks(applyClientSort(books));
+      $('resultsCount').textContent = `${books.length} book${books.length!==1?'s':''}`;
+      $('activeModeLabel').textContent = cat;
+      $('sectionMeta').textContent = `Filtered by category: ${cat}`;
+    } catch { showError(); }
+  }
+
+  /* ── SORT ─────────────────────────────────────────── */
+  async function setSort(field) {
+    currentSort = field;
+
+    // Update pill active states (toolbar)
+    ['sortDefault','sortPrice','sortRating'].forEach(id => $(`${id}`)?.classList.remove('active'));
+    ['sbDefault','sbPrice','sbRating'].forEach(id => $(`${id}`)?.classList.remove('active'));
+
+    const map = { default:'sortDefault', price:'sortPrice', rating:'sortRating' };
+    const map2 = { default:'sbDefault', price:'sbPrice', rating:'sbRating' };
+    $(map[field])?.classList.add('active');
+    $(map2[field])?.classList.add('active');
+
+    if (field === 'default') { fetchPage(1); return; }
+
+    showGridLoading();
+    hidePagination();
+
+    try {
+      const res   = await fetch(`${API}/books/sort/${field}`);
+      const books = await res.json();
+
+      // If category is active, filter the sorted result
+      const filtered = currentCat === 'all'
+        ? books
+        : books.filter(b => b.category.toLowerCase() === currentCat.toLowerCase());
+
+      renderBooks(filtered);
+      $('resultsCount').textContent = `${filtered.length} books`;
+      $('activeModeLabel').textContent = field === 'price' ? 'By Price' : 'By Rating';
+      $('sectionMeta').textContent = field === 'price' ? 'Sorted: cheapest first' : 'Sorted: highest rated first';
+    } catch { showError(); }
+  }
+
+  /* ── TOP RATED PAGE ──────────────────────────────── */
+  async function loadTopRated() {
+    isTopMode = true; currentSort = 'default';
+    $('searchInput').value = '';
+    showGridLoading();
+    hidePagination();
+
+    // Pill state
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    $('filterTop')?.classList.add('active');
+
+    try {
+      const res   = await fetch(`${API}/books/top`);
+      const books = await res.json();
+
+      renderBooks(books);
+      $('resultsCount').textContent = `${books.length} top-rated books`;
+      $('activeModeLabel').textContent = 'Top Rated';
+      $('sectionMeta').textContent = 'Rating ≥ 4.0 · Limit 5';
+    } catch { showError(); }
+  }
+
+  /* ── CLIENT SORT (used post-fetch) ───────────────── */
+  function applyClientSort(books) {
+    if (currentSort === 'price')  return [...books].sort((a,b) => a.price - b.price);
+    if (currentSort === 'rating') return [...books].sort((a,b) => b.rating - a.rating);
+    return books;
+  }
+
+  /* ── RENDER ──────────────────────────────────────── */
+  function renderBooks(books) {
+    const grid = $('booksGrid');
+    if (!books || books.length === 0) {
+      grid.innerHTML = `
+        <div class="state-box">
+          <div class="state-icon">📚</div>
+          <div class="state-title">No books found</div>
+          <div class="state-sub">Try a different search or filter.</div>
+        </div>`;
+      return;
+    }
+
+    grid.innerHTML = books.map((b, i) => `
+      <div class="book-card" data-cat="${escHtml(b.category)}"
+           style="animation-delay:${i * 0.04}s">
+        <div class="book-spine"></div>
+        <div class="book-card-body">
+          <div class="book-category">${escHtml(b.category)}</div>
+          <div class="book-title">${escHtml(b.title)}</div>
+          <div class="book-author">— ${escHtml(b.author)}</div>
+        </div>
+        <div class="book-card-footer">
+          <div class="book-price">₹${b.price}<span> INR</span></div>
+          <div class="book-meta-right">
+            <div class="book-rating-row">${starsHTML(b.rating)}<span style="font-size:10px;color:var(--ink-mute);margin-left:4px;">${b.rating}</span></div>
+            <div class="book-year">${b.year}</div>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ── PAGINATION ──────────────────────────────────── */
+  function updatePagination(page, totalPages) {
+    const bar = $('paginationBar');
+    if (totalPages <= 1) { bar.style.display = 'none'; return; }
+    bar.style.display = 'flex';
+    $('pageInfo').textContent = `Page ${page} of ${totalPages}`;
+    $('prevBtn').disabled = page <= 1;
+    $('nextBtn').disabled = page >= totalPages;
+  }
+
+  function changePage(dir) {
+    fetchPage(currentPage + dir);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function hidePagination() {
+    $('paginationBar').style.display = 'none';
+  }
+
+  /* ── UI HELPERS ──────────────────────────────────── */
+  function showGridLoading() {
+    $('booksGrid').innerHTML = `
+      <div class="state-box">
+        <div class="spinner"></div>
+        <p style="color:var(--ink-dim);margin-top:16px;font-size:12px;">Loading…</p>
+      </div>`;
+  }
+
+  function showError() {
+    $('booksGrid').innerHTML = `
+      <div class="state-box">
+        <div class="state-icon">⚡</div>
+        <div class="state-title">Connection Error</div>
+        <div class="state-sub">Make sure the server is running at port 4000.</div>
+      </div>`;
+    toast('Could not reach the server. Is it running?');
+  }
+
+  function escHtml(str) {
+    return String(str||'')
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
