@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NoteVault — Student Notes Manager</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    /* ── CSS VARIABLES ─────────────────────────────── */
+    :root {
+      --bg-0:      #0a0a0a;
+      --bg-1:      #111111;
+      --bg-2:      #1a1a1a;
+      --bg-3:      #242424;
+      --border:    #2e2e2e;
+      --border-lt: #3d3d3d;
+      --text-dim:  #555555;
+      --text-mute: #888888;
+      --text-soft: #b0b0b0;
+      --text-body: #d4d4d4;
+      --text-head: #f0f0f0;
+      --text-white: #ffffff;
+      --accent:    #e8e8e8;
+      --accent-dk: #c0c0c0;
+      --danger:    #c0392b;
+      --danger-dk: #922b21;
+      --success:   #27ae60;
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 14px;
+      --font-head: 'Syne', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+      --shadow:    0 4px 32px rgba(0,0,0,0.6);
+      --shadow-lg: 0 12px 64px rgba(0,0,0,0.8);
+    }
+
+    /* ── RESET & BASE ──────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-0);
+      color: var(--text-body);
+      font-family: var(--font-mono);
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Subtle background grid */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── LAYOUT ────────────────────────────────────── */
+    .app-wrapper {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ── HEADER ────────────────────────────────────── */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 32px 0 24px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 48px;
+    }
+
+    .logo-block { display: flex; align-items: baseline; gap: 12px; }
+
+    .logo-mark {
+      font-family: var(--font-head);
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -0.5px;
+    }
+
+    .logo-mark span {
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--text-white);
+      border-radius: 50%;
+      margin-left: 2px;
+      vertical-align: middle;
+      position: relative;
+      top: -2px;
+    }
+
+    .logo-sub {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-dim);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .note-count-badge {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-mute);
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 100px;
+      letter-spacing: 1px;
+    }
+
+    .note-count-badge b { color: var(--text-head); font-weight: 500; }
+
+    /* ── MAIN GRID ─────────────────────────────────── */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ── PANEL / CARD ──────────────────────────────── */
+    .panel {
+      background: var(--bg-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .panel-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .panel-icon {
+      width: 28px; height: 28px;
+      background: var(--bg-3);
+      border: 1px solid var(--border-lt);
+      border-radius: var(--radius-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+
+    .panel-title {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-head);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .panel-body { padding: 24px; }
+
+    /* ── FORM ELEMENTS ─────────────────────────────── */
+    .form-group { margin-bottom: 18px; }
+
+    .form-label {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-mute);
+      margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea, .form-select {
+      width: 100%;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-body);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: var(--border-lt);
+      background: var(--bg-3);
+      color: var(--text-head);
+    }
+
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--text-dim); }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.5;
+    }
+
+    /* ── BUTTONS ───────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all 0.18s ease;
+      padding: 10px 20px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--text-white);
+      color: var(--bg-0);
+      width: 100%;
+      padding: 12px;
+    }
+    .btn-primary:hover { background: var(--accent-dk); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-mute);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      font-size: 11px;
+    }
+    .btn-ghost:hover { border-color: var(--border-lt); color: var(--text-body); background: var(--bg-2); }
+
+    .btn-edit {
+      background: var(--bg-3);
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      padding: 7px 14px;
+      font-size: 10px;
+    }
+    .btn-edit:hover { border-color: var(--border-lt); color: var(--text-head); }
+
+    .btn-delete {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid transparent;
+      padding: 7px 10px;
+      font-size: 14px;
+      letter-spacing: 0;
+    }
+    .btn-delete:hover { color: var(--danger); border-color: var(--danger-dk); background: rgba(192,57,43,0.08); }
+
+    /* ── NOTES LIST ────────────────────────────────── */
+    .notes-panel { position: sticky; top: 24px; }
+
+    .notes-toolbar {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .search-wrap {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-dim);
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      color: var(--text-body);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      padding: 8px 12px 8px 34px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .search-input:focus { border-color: var(--border-lt); }
+    .search-input::placeholder { color: var(--text-dim); }
+
+    .notes-list { padding: 12px; }
+
+    /* ── NOTE CARD ─────────────────────────────────── */
+    .note-card {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 16px 18px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .note-card:hover { border-color: var(--border-lt); background: var(--bg-3); }
+    .note-card.active {
+      border-color: var(--accent-dk);
+      background: var(--bg-3);
+      box-shadow: 0 0 0 1px var(--border-lt) inset;
+    }
+
+    .note-card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .note-card-title {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-head);
+      line-height: 1.3;
+    }
+
+    .note-card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s; }
+    .note-card:hover .note-card-actions { opacity: 1; }
+
+    .note-card-subject {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+    }
+    .note-card-subject::before {
+      content: '';
+      width: 4px; height: 4px;
+      background: var(--text-dim);
+      border-radius: 50%;
+    }
+
+    .note-card-desc {
+      font-size: 12px;
+      color: var(--text-mute);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .note-card-date {
+      font-size: 10px;
+      color: var(--text-dim);
+      margin-top: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── EMPTY STATE ───────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 56px 24px;
+    }
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+    .empty-title {
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-soft);
+      margin-bottom: 8px;
+    }
+    .empty-sub { font-size: 12px; color: var(--text-dim); }
+
+    /* ── MODAL ─────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(6px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+    }
+    .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: var(--bg-1);
+      border: 1px solid var(--border-lt);
+      border-radius: var(--radius-lg);
+      width: 100%;
+      max-width: 520px;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.22s ease;
+    }
+    .modal-overlay.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      padding: 22px 26px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-head);
+    }
+
+    .modal-close {
+      background: var(--bg-3);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--text-mute);
+      width: 28px; height: 28px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.15s;
+    }
+    .modal-close:hover { color: var(--text-head); border-color: var(--border-lt); }
+
+    .modal-body { padding: 26px; }
+    .modal-footer {
+      padding: 0 26px 26px;
+      display: flex;
+      gap: 10px;
+    }
+
+    /* ── TOAST ─────────────────────────────────────── */
+    .toast-container {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      background: var(--bg-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      font-size: 12px;
+      color: var(--text-body);
+      min-width: 260px;
+      max-width: 360px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: toastIn 0.3s ease;
+    }
+
+    @keyframes toastIn {
+      from { opacity:0; transform:translateX(20px); }
+      to   { opacity:1; transform:translateX(0); }
+    }
+
+    .toast.success { border-left: 3px solid var(--success); }
+    .toast.error   { border-left: 3px solid var(--danger); }
+    .toast.info    { border-left: 3px solid var(--border-lt); }
+
+    .toast-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .toast.success .toast-dot { background: var(--success); }
+    .toast.error   .toast-dot { background: var(--danger); }
+    .toast.info    .toast-dot { background: var(--border-lt); }
+
+    /* ── DELETE CONFIRM ────────────────────────────── */
+    .confirm-modal-body {
+      padding: 26px;
+      text-align: center;
+    }
+    .confirm-icon { font-size: 36px; margin-bottom: 16px; opacity: 0.7; }
+    .confirm-text {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-head);
+      margin-bottom: 8px;
+    }
+    .confirm-sub { font-size: 12px; color: var(--text-mute); }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+      flex: 1;
+      padding: 12px;
+    }
+    .btn-danger:hover { background: var(--danger-dk); }
+
+    .btn-cancel { background: var(--bg-3); color: var(--text-soft); border: 1px solid var(--border); flex: 1; padding: 12px; }
+    .btn-cancel:hover { background: var(--bg-2); color: var(--text-head); }
+
+    /* ── LOADING SPINNER ───────────────────────────── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid var(--bg-3);
+      border-top-color: var(--text-body);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-overlay {
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px;
+      gap: 12px;
+      color: var(--text-mute);
+      font-size: 12px;
+    }
+
+    /* ── SCROLLBAR ─────────────────────────────────── */
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg-1); }
+    ::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-lt); }
+
+    /* ── RESPONSIVE ────────────────────────────────── */
+    @media (max-width: 900px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .notes-panel { position: static; }
+    }
+
+    @media (max-width: 560px) {
+      .site-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+    }
+
+    /* ── DIVIDER ───────────────────────────────────── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+
+    .char-count {
+      font-size: 10px;
+      color: var(--text-dim);
+      text-align: right;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-wrapper">
+
+  <!-- ── HEADER ─────────────────────────────────── -->
+  <header class="site-header">
+    <div class="logo-block">
+      <div class="logo-mark">NoteVault<span></span></div>
+      <div class="logo-sub">Student Notes Manager</div>
+    </div>
+    <div class="header-meta">
+      <div class="note-count-badge">
+        <b id="noteCountDisplay">0</b> notes
+      </div>
+    </div>
+  </header>
+
+  <!-- ── MAIN GRID ───────────────────────────────── -->
+  <div class="main-grid">
+
+    <!-- LEFT: Add / Edit Panel -->
+    <div>
+      <div class="panel" id="formPanel">
+        <div class="panel-header">
+          <div class="panel-icon">✦</div>
+          <div class="panel-title" id="formPanelTitle">Add New Note</div>
+        </div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label" for="noteTitle">Title</label>
+            <input class="form-input" type="text" id="noteTitle"
+                   placeholder="e.g. MongoDB Basics" maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="noteSubject">Subject</label>
+            <input class="form-input" type="text" id="noteSubject"
+                   placeholder="e.g. Database" maxlength="60" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="noteDescription">Description</label>
+            <textarea class="form-textarea" id="noteDescription"
+                      placeholder="Write your notes here…" maxlength="1200"
+                      oninput="updateCharCount(this)"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 1200</div>
+          </div>
+
+          <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">
+            <span id="submitBtnLabel">Save Note</span>
+          </button>
+
+          <div id="editModeActions" style="display:none; margin-top:10px;">
+            <button class="btn btn-ghost" style="width:100%; justify-content:center;" onclick="cancelEdit()">
+              Cancel Edit
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- API Reference Card -->
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <div class="panel-icon">⌗</div>
+          <div class="panel-title">API Endpoints</div>
+        </div>
+        <div class="panel-body" style="padding: 16px 20px;">
+          <div style="display:flex; flex-direction:column; gap:8px;">
+            <div style="display:flex; align-items:center; gap:10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="font-size:9px; letter-spacing:1px; color:#4a9eff; background:rgba(74,158,255,0.1); border:1px solid rgba(74,158,255,0.2); border-radius:3px; padding:2px 7px; font-weight:600; min-width:38px; text-align:center;">GET</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-soft);">/notes</span>
+              <span style="font-size:11px; color:var(--text-dim); margin-left:auto;">Fetch all</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="font-size:9px; letter-spacing:1px; color:#4caf50; background:rgba(76,175,80,0.1); border:1px solid rgba(76,175,80,0.2); border-radius:3px; padding:2px 7px; font-weight:600; min-width:38px; text-align:center;">POST</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-soft);">/notes</span>
+              <span style="font-size:11px; color:var(--text-dim); margin-left:auto;">Create</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding: 8px 0; border-bottom: 1px solid var(--border);">
+              <span style="font-size:9px; letter-spacing:1px; color:#ff9800; background:rgba(255,152,0,0.1); border:1px solid rgba(255,152,0,0.2); border-radius:3px; padding:2px 7px; font-weight:600; min-width:38px; text-align:center;">PUT</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-soft);">/notes/:id</span>
+              <span style="font-size:11px; color:var(--text-dim); margin-left:auto;">Update</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding: 8px 0;">
+              <span style="font-size:9px; letter-spacing:1px; color:#e53935; background:rgba(229,57,53,0.1); border:1px solid rgba(229,57,53,0.2); border-radius:3px; padding:2px 7px; font-weight:600; min-width:38px; text-align:center;">DEL</span>
+              <span style="font-family:var(--font-mono); font-size:11px; color:var(--text-soft);">/notes/:id</span>
+              <span style="font-size:11px; color:var(--text-dim); margin-left:auto;">Delete</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Notes List Panel -->
+    <div class="panel notes-panel">
+      <div class="panel-header">
+        <div class="panel-icon">≡</div>
+        <div class="panel-title">All Notes</div>
+      </div>
+      <div class="notes-toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" type="text" id="searchInput"
+                 placeholder="Search by title or subject…"
+                 oninput="filterNotes(this.value)" />
+        </div>
+        <button class="btn btn-ghost" onclick="loadNotes()" title="Refresh">↺</button>
+      </div>
+      <div class="notes-list" id="notesList">
+        <div class="loading-overlay">
+          <div class="spinner"></div> Loading notes…
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── EDIT MODAL ──────────────────────────────────── -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Edit Note</div>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label class="form-label">Title</label>
+        <input class="form-input" type="text" id="editTitle" placeholder="Note title" />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Subject</label>
+        <input class="form-input" type="text" id="editSubject" placeholder="Subject" />
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label class="form-label">Description</label>
+        <textarea class="form-textarea" id="editDescription" placeholder="Description"></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" style="flex:1; width:auto;" onclick="submitEdit()">
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── DELETE CONFIRM MODAL ────────────────────────── -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="confirm-modal-body">
+      <div class="confirm-icon">⚠</div>
+      <div class="confirm-text">Delete this note?</div>
+      <div class="confirm-sub" id="deleteNoteTitle" style="margin-top:4px;"></div>
+      <p class="confirm-sub" style="margin-top:12px;">This action cannot be undone.</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST CONTAINER ─────────────────────────────── -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── JAVASCRIPT ──────────────────────────────────── -->
+<script>
+  /* ─── CONFIG ─────────────────────────────────────── */
+  const API_BASE = '/notes';
+  let allNotes = [];
+  let editingId = null;
+  let deletingId = null;
+
+  /* ─── HELPERS ────────────────────────────────────── */
+  const $ = (id) => document.getElementById(id);
+
+  function showToast(message, type = 'info') {
+    const container = $('toastContainer');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span class="toast-dot"></span>${message}`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateX(20px)';
+      toast.style.transition = 'all 0.3s';
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  function updateCharCount(el) {
+    $('charCount').textContent = el.value.length;
+  }
+
+  function formatDate(dateStr) {
+    if (!dateStr) return '';
+    try {
+      return new Date(dateStr).toLocaleDateString('en-US', {
+        year: 'numeric', month: 'short', day: 'numeric'
+      });
+    } catch { return dateStr; }
+  }
+
+  /* ─── CRUD: LOAD ─────────────────────────────────── */
+  async function loadNotes() {
+    $('notesList').innerHTML = `
+      <div class="loading-overlay">
+        <div class="spinner"></div> Fetching notes…
+      </div>`;
+    try {
+      const res = await fetch(API_BASE);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      allNotes = await res.json();
+      $('noteCountDisplay').textContent = allNotes.length;
+      renderNotes(allNotes);
+    } catch (err) {
+      $('notesList').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">⚡</div>
+          <div class="empty-title">Connection Error</div>
+          <div class="empty-sub">Could not reach the server.<br/>Make sure the backend is running.</div>
+        </div>`;
+      showToast('Failed to load notes — is the server running?', 'error');
+    }
+  }
+
+  /* ─── RENDER ─────────────────────────────────────── */
+  function renderNotes(notes) {
+    const list = $('notesList');
+    if (notes.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📄</div>
+          <div class="empty-title">No notes yet</div>
+          <div class="empty-sub">Add your first note using the form.</div>
+        </div>`;
+      return;
+    }
+    list.innerHTML = notes.map(n => `
+      <div class="note-card" id="card-${n._id}" onclick="selectCard('${n._id}')">
+        <div class="note-card-header">
+          <div class="note-card-title">${escapeHtml(n.title)}</div>
+          <div class="note-card-actions">
+            <button class="btn btn-edit" onclick="openEditModal('${n._id}', event)" title="Edit">Edit</button>
+            <button class="btn btn-delete" onclick="openDeleteModal('${n._id}', '${escapeHtml(n.title)}', event)" title="Delete">✕</button>
+          </div>
+        </div>
+        <div class="note-card-subject">${escapeHtml(n.subject)}</div>
+        <div class="note-card-desc">${escapeHtml(n.description)}</div>
+        <div class="note-card-date">${formatDate(n.created_date)}</div>
+      </div>
+    `).join('');
+  }
+
+  function escapeHtml(text) {
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function selectCard(id) {
+    document.querySelectorAll('.note-card').forEach(c => c.classList.remove('active'));
+    const card = document.getElementById(`card-${id}`);
+    if (card) card.classList.add('active');
+  }
+
+  /* ─── FILTER / SEARCH ────────────────────────────── */
+  function filterNotes(query) {
+    const q = query.toLowerCase();
+    const filtered = allNotes.filter(n =>
+      n.title.toLowerCase().includes(q) ||
+      n.subject.toLowerCase().includes(q)
+    );
+    renderNotes(filtered);
+  }
+
+  /* ─── CRUD: CREATE ───────────────────────────────── */
+  async function handleSubmit() {
+    const title       = $('noteTitle').value.trim();
+    const subject     = $('noteSubject').value.trim();
+    const description = $('noteDescription').value.trim();
+
+    if (!title || !subject || !description) {
+      showToast('Please fill in all fields.', 'error');
+      return;
+    }
+
+    const btn = $('submitBtn');
+    btn.disabled = true;
+    $('submitBtnLabel').innerHTML = '<span class="spinner" style="border-top-color:#000;"></span>';
+
+    try {
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, subject, description })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Create failed');
+
+      showToast('Note saved successfully.', 'success');
+      clearForm();
+      loadNotes();
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      btn.disabled = false;
+      $('submitBtnLabel').textContent = 'Save Note';
+    }
+  }
+
+  function clearForm() {
+    $('noteTitle').value = '';
+    $('noteSubject').value = '';
+    $('noteDescription').value = '';
+    $('charCount').textContent = '0';
+  }
+
+  function cancelEdit() {
+    clearForm();
+    editingId = null;
+    $('formPanelTitle').textContent = 'Add New Note';
+    $('submitBtnLabel').textContent = 'Save Note';
+    $('editModeActions').style.display = 'none';
+  }
+
+  /* ─── CRUD: EDIT MODAL ───────────────────────────── */
+  function openEditModal(id, event) {
+    event.stopPropagation();
+    const note = allNotes.find(n => n._id === id);
+    if (!note) return;
+    editingId = id;
+    $('editTitle').value = note.title;
+    $('editSubject').value = note.subject;
+    $('editDescription').value = note.description;
+    $('editModal').classList.add('open');
+  }
+
+  function closeEditModal() {
+    $('editModal').classList.remove('open');
+    editingId = null;
+  }
+
+  async function submitEdit() {
+    const title       = $('editTitle').value.trim();
+    const subject     = $('editSubject').value.trim();
+    const description = $('editDescription').value.trim();
+
+    if (!title && !subject && !description) {
+      showToast('Nothing to update.', 'error');
+      return;
+    }
+
+    try {
+      const body = {};
+      if (title) body.title = title;
+      if (subject) body.subject = subject;
+      if (description) body.description = description;
+
+      const res = await fetch(`${API_BASE}/${editingId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Update failed');
+
+      showToast('Note updated.', 'success');
+      closeEditModal();
+      loadNotes();
+    } catch (err) {
+      showToast(err.message, 'error');
+    }
+  }
+
+  /* ─── CRUD: DELETE ───────────────────────────────── */
+  function openDeleteModal(id, title, event) {
+    event.stopPropagation();
+    deletingId = id;
+    $('deleteNoteTitle').textContent = `"${title}"`;
+    $('deleteModal').classList.add('open');
+  }
+
+  function closeDeleteModal() {
+    $('deleteModal').classList.remove('open');
+    deletingId = null;
+  }
+
+  async function confirmDelete() {
+    if (!deletingId) return;
+    try {
+      const res = await fetch(`${API_BASE}/${deletingId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Delete failed');
+      showToast('Note deleted.', 'success');
+      closeDeleteModal();
+      loadNotes();
+    } catch (err) {
+      showToast(err.message, 'error');
+      closeDeleteModal();
+    }
+  }
+
+  /* ─── MODAL: CLOSE ON BACKDROP ───────────────────── */
+  $('editModal').addEventListener('click', (e) => {
+    if (e.target === $('editModal')) closeEditModal();
+  });
+  $('deleteModal').addEventListener('click', (e) => {
+    if (e.target === $('deleteModal')) closeDeleteModal();
+  });
+
+  /* ─── KEYBOARD SHORTCUTS ─────────────────────────── */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeEditModal();
+      closeDeleteModal();
+    }
+  });
+
+  /* ─── INIT ───────────────────────────────────────── */
+  window.addEventListener('DOMContentLoaded', loadNotes);
+</script>
+</body>
+</html>
